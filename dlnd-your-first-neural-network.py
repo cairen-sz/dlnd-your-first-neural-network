@@ -118,7 +118,7 @@ val_features, val_targets = features[-60*24:], targets[-60*24:]
 # 4. Implement the forward pass in the `run` method.
 #   
 
-# In[57]:
+# In[23]:
 
 def sigmoid(x):
     return 1 / (1 + np.exp(-x))
@@ -164,12 +164,12 @@ class NeuralNetwork(object):
         output_errors = targets - final_outputs
         
         # TODO: Backpropagated error
-        hidden_errors = np.dot(self.weights_hidden_to_output.T, output_errors) *                         hidden_outputs * (1 - hidden_outputs)
-        hidden_grad = self.lr * np.dot(hidden_errors, inputs.T)
+        hidden_errors = np.dot(self.weights_hidden_to_output.T, output_errors) 
+        hidden_grad = hidden_outputs * (1 - hidden_outputs)
         
         # TODO: Update the weights
         self.weights_hidden_to_output += self.lr * np.dot(output_errors, hidden_outputs.T)
-        self.weights_input_to_hidden += hidden_grad
+        self.weights_input_to_hidden += self.lr * np.dot(hidden_errors * hidden_grad, inputs.T)
         
     def run(self, inputs_list):
         # Run a forward pass through the network
@@ -208,14 +208,14 @@ def MSE(y, Y):
 # ### Choose the number of hidden nodes
 # The more hidden nodes you have, the more accurate predictions the model will make. Try a few different numbers and see how it affects the performance. You can look at the losses dictionary for a metric of the network performance. If the number of hidden units is too low, then the model won't have enough space to learn and if it is too high there are too many options for the direction that the learning can take. The trick here is to find the right balance in number of hidden units you choose.
 
-# In[181]:
+# In[42]:
 
 import sys
 
 ### Set the hyperparameters here ###
-epochs = 3000
-learning_rate = 0.005
-hidden_nodes = 25
+epochs = 5500
+learning_rate = 0.0055
+hidden_nodes = 26
 output_nodes = 1
 
 N_i = train_features.shape[1]
@@ -238,7 +238,7 @@ for e in range(epochs):
     losses['validation'].append(val_loss)
 
 
-# In[182]:
+# In[43]:
 
 plt.plot(losses['train'], label='Training loss')
 plt.plot(losses['validation'], label='Validation loss')
@@ -250,7 +250,7 @@ plt.ylim(0,0.5)
 # 
 # Here, use the test data to view how well your network is modeling the data. If something is completely wrong here, make sure each step in your network is implemented correctly.
 
-# In[183]:
+# In[44]:
 
 fig, ax = plt.subplots(figsize=(8,4))
 
@@ -283,6 +283,10 @@ _ = ax.set_xticklabels(dates[12::24], rotation=45)
 # |3000|0.002|20|0.193|0.355|
 # |3500|0.005|25|0.071|0.159|
 # |3500|0.005|30|0.067|0.153|
+# |4500|0.005|30|0.058|0.161|
+# |**5500**|**0.0055**|**26**|**0.057**|**0.127**|
+# |6000|0.0055|25|0.054|0.193|
+# |8000|0.0055|25|0.051|0.159|
 # |3500|0.01|30|0.057|0.183|
 # |4000|0.002|40|0.094|0.199|
 # |5000|0.002|50|0.074|0.161|
@@ -297,7 +301,7 @@ _ = ax.set_xticklabels(dates[12::24], rotation=45)
 # 
 # Run these unit tests to check the correctness of your network implementation. These tests must all be successful to pass the project.
 
-# In[58]:
+# In[45]:
 
 import unittest
 
